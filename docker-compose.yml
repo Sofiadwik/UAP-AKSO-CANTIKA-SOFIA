@@ -1,0 +1,59 @@
+version: '3.9'  
+name: Cantika - Sofia UAP AKSO 2024
+
+services:  
+  nginx:  
+    image: nginx:latest  
+    container_name: nginx_server1  
+    ports:  
+      - "8080:80"  
+    volumes:  
+      - ./nginx_html:/usr/share/nginx/html
+  
+    networks:  
+      - app_network  
+    
+    configs:  
+      - source: nginx_config  
+        target: /etc/nginx/nginx.conf  
+
+  mysql:  
+    image: mysql:latest  
+    container_name: mysql_server1  
+    environment:  
+      MYSQL_ROOT_PASSWORD: rootpassword  
+      MYSQL_DATABASE: uapakso  
+      MYSQL_USER: sofiacantika  
+      MYSQL_PASSWORD: userpassword  
+    ports:  
+      - "3306:3306"  
+    volumes:  
+      - mysql_data:/var/lib/mysql  
+    networks:  
+      - app_network  
+  
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin_server1
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "8081:80"  
+    depends_on:
+      - mysql
+    networks:
+      - app_network
+
+
+volumes:  
+  nginx_data:  
+  mysql_data:  
+
+networks:  
+  app_network:  
+
+configs:  
+  nginx_config:  
+    file: ./nginx.conf  
